@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubekitchen-dev
+  namespace: argocd
+  labels:
+    project: kubekitchen
+    environment: dev
+  finalizers:
+    # Enables cascade delete — removing this ArgoCD app removes k8s resources
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    # ── Point this to your GitOps repository ──────────────────────
+    repoURL: https://github.com/Kubekitchen/Kubekitchen-GitOps.git
+    targetRevision: main          # Branch / tag / commit SHA
+    path: kubekitchen-helm        # Path to the umbrella chart in the repo
+
+    helm:
+      # Values file layering: base values + env override
+      valueFiles:
+        - values.yaml
+        - values-dev.yaml
+      # Release name used as .Release.Name in templates
+      releaseName: kubekitchen
+
+  destination:
+    server: https://kubernetes.default.svc   # In-cluster (same cluster as ArgoCD)
+    namespace: kubekitchen-dev               # Target namespace
+
+  syncPolicy:
+    automated:
+      prune: true        # Remove k8s resources deleted from Git
+      selfHeal: true     # Re-sync if someone manually changes k8s state
+      allowEmpty: false  # Prevent accidentally syncing an empty chart
+    syncOptions:
+      - CreateNamespace=true          # Auto-create namespace if missing
+      - PrunePropagationPolicy=foreground  # Wait for child resources before pruning
+      - RespectIgnoreDifferences=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  # Ignore differences in fields that k8s mutates automatically
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas   # Ignored so HPA can manage replicas freely
+    - group: ""
+      kind: Secret
+      jsonPointers:
+        - /data            # Prevents ArgoCD from overwriting live secret values

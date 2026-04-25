@@ -1,0 +1,16 @@
+# Default values for seeder sub-chart
+# Overridden by umbrella values.yaml under the seeder: key
+enabled: true
+image:
+  repository: "secretpower/kubekitchen-seeder"
+  tag: ""
+  pullPolicy: ""
+ttlSecondsAfterFinished: 300
+backoffLimit: 3
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"

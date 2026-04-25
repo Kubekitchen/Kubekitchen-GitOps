@@ -1,0 +1,86 @@
+{{- if .Values.global.blueGreen }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+{{- else }}
+apiVersion: apps/v1
+kind: Deployment
+{{- end }}
+metadata:
+  name: frontend
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "frontend.labels" . | nindent 4 }}
+    tier: frontend
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "frontend.selectorLabels" . | nindent 6 }}
+  {{- if .Values.global.blueGreen }}
+  strategy:
+    blueGreen:
+      activeService: frontend-active
+      previewService: frontend-preview
+      autoPromotionEnabled: false
+      scaleDownDelaySeconds: 30
+  {{- else }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "frontend.selectorLabels" . | nindent 8 }}
+        {{- include "frontend.labels" . | nindent 8 }}
+        tier: frontend
+      annotations:
+        # Restart pod when image tag changes (checksum of image tag value)
+        rollme: {{ .Values.image.tag | default .Values.global.imageTag | sha256sum }}
+    spec:
+      serviceAccountName: {{ .Values.global.serviceAccountName }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: frontend
+          image: "{{ .Values.image.repository }}:{{ include "frontend.imageTag" . }}"
+          imagePullPolicy: {{ include "frontend.imagePullPolicy" . }}
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+              name: http
+              protocol: TCP
+          env:
+            - name: NODE_ENV
+              value: {{ .Values.global.nodeEnv | quote }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.liveness.path }}
+              port: {{ .Values.probes.liveness.port }}
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.readiness.path }}
+              port: {{ .Values.probes.readiness.port }}
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: 3
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: {{ .Values.probes.startup.path }}
+              port: {{ .Values.probes.startup.port }}
+            initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}

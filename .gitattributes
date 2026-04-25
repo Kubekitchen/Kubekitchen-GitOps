@@ -1,0 +1,16 @@
+# Normalize line endings to LF for all text files
+# This ensures consistent behavior between Windows editing and Linux EC2 deployment
+* text=auto eol=lf
+
+# Explicitly mark these as text with LF
+*.yaml text eol=lf
+*.yml  text eol=lf
+*.tpl  text eol=lf
+*.md   text eol=lf
+*.json text eol=lf
+*.sh   text eol=lf
+
+# Binary files — do not touch line endings
+*.png  binary
+*.jpg  binary
+*.gif  binary

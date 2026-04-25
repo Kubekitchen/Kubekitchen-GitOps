@@ -1,0 +1,29 @@
+# Default values for mongodb sub-chart
+# Overridden by umbrella values.yaml under the mongodb: key
+enabled: true
+image:
+  repository: "mongo"
+  tag: "7"
+  pullPolicy: IfNotPresent
+storage:
+  size: "5Gi"
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "100m"
+  limits:
+    memory: "512Mi"
+    cpu: "300m"
+securityContext:
+  runAsUser: 999
+  runAsGroup: 999
+  fsGroup: 999
+probes:
+  liveness:
+    initialDelaySeconds: 40
+    periodSeconds: 20
+    timeoutSeconds: 10
+  readiness:
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 5

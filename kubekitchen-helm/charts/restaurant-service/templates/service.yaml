@@ -1,0 +1,64 @@
+{{- if .Values.global.blueGreen }}
+# ─── PROD: Active Service (Blue) ───────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: restaurant-service-active
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "restaurant-service.labels" . | nindent 4 }}
+    tier: backend
+    role: active
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "restaurant-service.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+---
+# ─── PROD: Preview Service (Green) ─────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: restaurant-service-preview
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "restaurant-service.labels" . | nindent 4 }}
+    tier: backend
+    role: preview
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "restaurant-service.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+{{- else }}
+# ─── DEV: Single ClusterIP Service ─────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: restaurant-service
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "restaurant-service.labels" . | nindent 4 }}
+    tier: backend
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "restaurant-service.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+{{- end }}

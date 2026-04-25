@@ -1,0 +1,7 @@
+﻿{{ include "mongodb.pvc" (dict "name" "auth" "Values" .Values "Release" .Release "Chart" .Chart) }}
+---
+{{ include "mongodb.pvc" (dict "name" "restaurant" "Values" .Values "Release" .Release "Chart" .Chart) }}
+---
+{{ include "mongodb.pvc" (dict "name" "menu" "Values" .Values "Release" .Release "Chart" .Chart) }}
+---
+{{ include "mongodb.pvc" (dict "name" "order" "Values" .Values "Release" .Release "Chart" .Chart) }}

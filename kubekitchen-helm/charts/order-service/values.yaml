@@ -1,0 +1,14 @@
+# Default values for order-service sub-chart
+# Overridden by umbrella values.yaml under the order-service: key
+enabled: true
+replicaCount: 1
+image:
+  repository: "secretpower/kubekitchen-order-service"
+  tag: ""
+  pullPolicy: ""
+service:
+  port: 4004
+  targetPort: 4004
+  type: ClusterIP
+resources: {}
+probes: {}

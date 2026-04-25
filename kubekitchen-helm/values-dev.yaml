@@ -1,0 +1,41 @@
+# ── Dev Environment Overrides ────────────────────────────────
+# These values are layered ON TOP of values.yaml for the dev namespace
+global:
+  environment: dev
+  namespace: kubekitchen-dev
+  imageTag: "dev-latest"
+  nodeEnv: "development"
+  jwtSecret: "dev-jwt-secret-change-this-256bit-key"
+  jwtExpiresIn: "7d"
+  mongoUris:
+    auth: "mongodb://mongodb-auth-0.mongodb-auth-headless.kubekitchen-dev.svc.cluster.local:27017/authdb"
+    restaurant: "mongodb://mongodb-restaurant-0.mongodb-restaurant-headless.kubekitchen-dev.svc.cluster.local:27017/restaurantdb"
+    menu: "mongodb://mongodb-menu-0.mongodb-menu-headless.kubekitchen-dev.svc.cluster.local:27017/menudb"
+    order: "mongodb://mongodb-order-0.mongodb-order-headless.kubekitchen-dev.svc.cluster.local:27017/orderdb"
+  serviceUrls:
+    auth: "http://auth-service.kubekitchen-dev.svc.cluster.local:4001"
+    restaurant: "http://restaurant-service.kubekitchen-dev.svc.cluster.local:4002"
+    menu: "http://menu-service.kubekitchen-dev.svc.cluster.local:4003"
+    order: "http://order-service.kubekitchen-dev.svc.cluster.local:4004"
+
+auth-service:
+  replicaCount: 1
+
+restaurant-service:
+  replicaCount: 1
+
+menu-service:
+  replicaCount: 1
+
+order-service:
+  replicaCount: 1
+
+frontend:
+  replicaCount: 1
+
+mongodb:
+  storage:
+    size: "5Gi"
+
+seeder:
+  enabled: true

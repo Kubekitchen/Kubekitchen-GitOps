@@ -1,0 +1,11 @@
+﻿# Auth MongoDB
+{{ include "mongodb.statefulset" (dict "name" "auth" "database" "authdb" "Values" .Values "Release" .Release "Chart" .Chart) }}
+---
+# Restaurant MongoDB
+{{ include "mongodb.statefulset" (dict "name" "restaurant" "database" "restaurantdb" "Values" .Values "Release" .Release "Chart" .Chart) }}
+---
+# Menu MongoDB
+{{ include "mongodb.statefulset" (dict "name" "menu" "database" "menudb" "Values" .Values "Release" .Release "Chart" .Chart) }}
+---
+# Order MongoDB
+{{ include "mongodb.statefulset" (dict "name" "order" "database" "orderdb" "Values" .Values "Release" .Release "Chart" .Chart) }}

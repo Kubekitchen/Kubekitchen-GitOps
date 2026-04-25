@@ -1,0 +1,8 @@
+# Patterns to ignore when building packages.
+# Helm ignores these during `helm package` and `helm dependency build`
+.DS_Store
+.git/
+.gitignore
+*.md
+tests/
+ci/

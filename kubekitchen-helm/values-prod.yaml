@@ -1,0 +1,78 @@
+# ── Prod Environment Overrides ───────────────────────────────
+# These values are layered ON TOP of values.yaml for the prod namespace
+global:
+  environment: prod
+  namespace: kubekitchen-prod
+  imageTag: "prod-latest"
+  nodeEnv: "production"
+  blueGreen: true   # ← Enables Argo Rollouts blue-green in prod
+  # ⚠️  Replace with a real 256-bit secret — use Sealed Secrets or ESO in prod!
+  jwtSecret: "prod-jwt-secret-REPLACE-WITH-STRONG-256BIT-SECRET"
+  jwtExpiresIn: "1d"
+  mongoUris:
+    auth: "mongodb://mongodb-auth-0.mongodb-auth-headless.kubekitchen-prod.svc.cluster.local:27017/authdb"
+    restaurant: "mongodb://mongodb-restaurant-0.mongodb-restaurant-headless.kubekitchen-prod.svc.cluster.local:27017/restaurantdb"
+    menu: "mongodb://mongodb-menu-0.mongodb-menu-headless.kubekitchen-prod.svc.cluster.local:27017/menudb"
+    order: "mongodb://mongodb-order-0.mongodb-order-headless.kubekitchen-prod.svc.cluster.local:27017/orderdb"
+  serviceUrls:
+    auth: "http://auth-service.kubekitchen-prod.svc.cluster.local:4001"
+    restaurant: "http://restaurant-service.kubekitchen-prod.svc.cluster.local:4002"
+    menu: "http://menu-service.kubekitchen-prod.svc.cluster.local:4003"
+    order: "http://order-service.kubekitchen-prod.svc.cluster.local:4004"
+
+auth-service:
+  replicaCount: 2
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+restaurant-service:
+  replicaCount: 2
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+menu-service:
+  replicaCount: 2
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+order-service:
+  replicaCount: 2
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+frontend:
+  replicaCount: 2
+
+mongodb:
+  storage:
+    size: "20Gi"
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+seeder:
+  enabled: false  # Do NOT re-seed automatically in prod

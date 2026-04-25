@@ -1,0 +1,14 @@
+# Default values for frontend sub-chart
+# Overridden by umbrella values.yaml under the frontend: key
+enabled: true
+replicaCount: 1
+image:
+  repository: "secretpower/kubekitchen-frontend"
+  tag: ""
+  pullPolicy: ""
+service:
+  port: 8080
+  targetPort: 8080
+  type: ClusterIP
+resources: {}
+probes: {}

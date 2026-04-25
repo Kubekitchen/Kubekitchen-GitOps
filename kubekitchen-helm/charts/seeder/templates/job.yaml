@@ -1,0 +1,72 @@
+{{- if .Values.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kubekitchen-seeder
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: seeder
+    project: {{ .Values.global.project }}
+    environment: {{ .Values.global.environment }}
+    app.kubernetes.io/part-of: kubekitchen
+    app.kubernetes.io/component: seeder
+  annotations:
+    # Helm hook: runs after all resources are installed
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "5"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-failed
+    argocd.argoproj.io/sync-wave: "5"
+spec:
+  ttlSecondsAfterFinished: {{ .Values.ttlSecondsAfterFinished }}
+  backoffLimit: {{ .Values.backoffLimit }}
+  template:
+    metadata:
+      labels:
+        app: seeder
+        project: {{ .Values.global.project }}
+    spec:
+      serviceAccountName: {{ .Values.global.serviceAccountName }}
+      restartPolicy: OnFailure
+      initContainers:
+        - name: wait-for-mongo-restaurant
+          image: "{{ .Values.image.repository }}:{{ include "seeder.imageTag" . }}"
+          command:
+            - sh
+            - -c
+            - |
+              until mongosh --eval "db.adminCommand('ping')" \
+                "{{ .Values.global.mongoUris.restaurant }}" --quiet; do
+                echo "Waiting for mongodb-restaurant..."
+                sleep 5
+              done
+              echo "mongodb-restaurant is ready!"
+        - name: wait-for-mongo-menu
+          image: "{{ .Values.image.repository }}:{{ include "seeder.imageTag" . }}"
+          command:
+            - sh
+            - -c
+            - |
+              until mongosh --eval "db.adminCommand('ping')" \
+                "{{ .Values.global.mongoUris.menu }}" --quiet; do
+                echo "Waiting for mongodb-menu..."
+                sleep 5
+              done
+              echo "mongodb-menu is ready!"
+      containers:
+        - name: seeder
+          image: "{{ .Values.image.repository }}:{{ include "seeder.imageTag" . }}"
+          imagePullPolicy: {{ include "seeder.imagePullPolicy" . }}
+          env:
+            - name: RESTAURANT_MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: kubekitchen-secrets
+                  key: MONGO_RESTAURANT_URI
+            - name: MENU_MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: kubekitchen-secrets
+                  key: MONGO_MENU_URI
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+{{- end }}

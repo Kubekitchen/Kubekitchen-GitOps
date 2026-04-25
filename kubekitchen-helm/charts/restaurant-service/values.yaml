@@ -1,0 +1,14 @@
+# Default values for restaurant-service sub-chart
+# Overridden by umbrella values.yaml under the restaurant-service: key
+enabled: true
+replicaCount: 1
+image:
+  repository: "secretpower/kubekitchen-restaurant-service"
+  tag: ""
+  pullPolicy: ""
+service:
+  port: 4002
+  targetPort: 4002
+  type: ClusterIP
+resources: {}
+probes: {}

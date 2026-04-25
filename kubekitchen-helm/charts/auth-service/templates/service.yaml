@@ -1,0 +1,75 @@
+{{/*
+  auth-service/templates/service.yaml
+  ─────────────────────────────────────────────────────────────
+  Dev  (blueGreen=false): single ClusterIP service "auth-service"
+  Prod (blueGreen=true) : two services —
+    auth-service-active  → routes traffic to BLUE (stable/live)
+    auth-service-preview → routes traffic to GREEN (new version)
+  Argo Rollouts controller manages which pod revision each points to.
+*/}}
+
+{{- if .Values.global.blueGreen }}
+# ─── PROD: Active Service (Blue — live traffic) ────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service-active
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "auth-service.labels" . | nindent 4 }}
+    tier: backend
+    role: active
+  annotations:
+    # Argo Rollouts manages selector updates on this service
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "auth-service.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+---
+# ─── PROD: Preview Service (Green — new version) ───────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service-preview
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "auth-service.labels" . | nindent 4 }}
+    tier: backend
+    role: preview
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "auth-service.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+{{- else }}
+# ─── DEV: Single ClusterIP Service ─────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "auth-service.labels" . | nindent 4 }}
+    tier: backend
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "auth-service.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+{{- end }}

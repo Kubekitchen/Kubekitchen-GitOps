@@ -1,0 +1,14 @@
+# Default values for auth-service sub-chart
+# Overridden by umbrella values.yaml under the auth-service: key
+enabled: true
+replicaCount: 1
+image:
+  repository: "secretpower/kubekitchen-auth-service"
+  tag: ""
+  pullPolicy: ""
+service:
+  port: 4001
+  targetPort: 4001
+  type: ClusterIP
+resources: {}
+probes: {}

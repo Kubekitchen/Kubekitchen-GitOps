@@ -1,0 +1,282 @@
+# ╔══════════════════════════════════════════════════════════╗
+# ║         KubeKitchen Global Values (Umbrella)            ║
+# ║  All sub-charts inherit and can override these values   ║
+# ╚══════════════════════════════════════════════════════════╝
+
+# ── Global Settings ─────────────────────────────────────────
+global:
+  # Docker image settings
+  imageRegistry: "docker.io"
+  imageOwner: "secretpower"
+  imageTag: "dev-latest"
+  imagePullPolicy: Always
+
+  # Blue-Green deployment strategy (requires Argo Rollouts)
+  # false = regular Deployment (dev) | true = Argo Rollout blue-green (prod)
+  blueGreen: false
+
+  # Environment
+  environment: dev
+  namespace: kubekitchen-dev
+
+  # Project labels
+  project: kubekitchen
+
+  # JWT Secret (override per environment — use Sealed Secrets / ESO in prod)
+  jwtSecret: "dev-jwt-secret-change-this-256bit-key"
+  jwtExpiresIn: "7d"
+
+  # Node environment
+  nodeEnv: "development"
+
+  # Storage class (must exist in your cluster — matches your NFS provisioner)
+  storageClass: "kubekitchen-nfs"
+
+  # Service account (created once in umbrella templates/)
+  serviceAccountName: "kubekitchen-sa"
+
+  # MongoDB connection URIs (consumed by services via Secret)
+  mongoUris:
+    auth: "mongodb://mongodb-auth-0.mongodb-auth-headless:27017/authdb"
+    restaurant: "mongodb://mongodb-restaurant-0.mongodb-restaurant-headless:27017/restaurantdb"
+    menu: "mongodb://mongodb-menu-0.mongodb-menu-headless:27017/menudb"
+    order: "mongodb://mongodb-order-0.mongodb-order-headless:27017/orderdb"
+
+  # Internal ClusterIP service URLs (injected as env vars into containers)
+  serviceUrls:
+    auth: "http://auth-service:4001"
+    restaurant: "http://restaurant-service:4002"
+    menu: "http://menu-service:4003"
+    order: "http://order-service:4004"
+
+# ── Auth Service ─────────────────────────────────────────────
+auth-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "secretpower/kubekitchen-auth-service"
+    tag: ""           # Empty = falls back to global.imageTag
+    pullPolicy: ""    # Empty = falls back to global.imagePullPolicy
+  service:
+    port: 4001
+    targetPort: 4001
+    type: ClusterIP
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "300m"
+  probes:
+    liveness:
+      path: /health
+      port: 4001
+      initialDelaySeconds: 25
+      periodSeconds: 15
+    readiness:
+      path: /health
+      port: 4001
+      initialDelaySeconds: 10
+      periodSeconds: 10
+    startup:
+      path: /health
+      port: 4001
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      failureThreshold: 10
+
+# ── Restaurant Service ───────────────────────────────────────
+restaurant-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "secretpower/kubekitchen-restaurant-service"
+    tag: ""
+    pullPolicy: ""
+  service:
+    port: 4002
+    targetPort: 4002
+    type: ClusterIP
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "300m"
+  probes:
+    liveness:
+      path: /health
+      port: 4002
+      initialDelaySeconds: 25
+      periodSeconds: 15
+    readiness:
+      path: /health
+      port: 4002
+      initialDelaySeconds: 10
+      periodSeconds: 10
+    startup:
+      path: /health
+      port: 4002
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      failureThreshold: 10
+
+# ── Menu Service ─────────────────────────────────────────────
+menu-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "secretpower/kubekitchen-menu-service"
+    tag: ""
+    pullPolicy: ""
+  service:
+    port: 4003
+    targetPort: 4003
+    type: ClusterIP
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "300m"
+  probes:
+    liveness:
+      path: /health
+      port: 4003
+      initialDelaySeconds: 25
+      periodSeconds: 15
+    readiness:
+      path: /health
+      port: 4003
+      initialDelaySeconds: 10
+      periodSeconds: 10
+    startup:
+      path: /health
+      port: 4003
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      failureThreshold: 10
+
+# ── Order Service ────────────────────────────────────────────
+order-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "secretpower/kubekitchen-order-service"
+    tag: ""
+    pullPolicy: ""
+  service:
+    port: 4004
+    targetPort: 4004
+    type: ClusterIP
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "300m"
+  probes:
+    liveness:
+      path: /health
+      port: 4004
+      initialDelaySeconds: 25
+      periodSeconds: 15
+    readiness:
+      path: /health
+      port: 4004
+      initialDelaySeconds: 10
+      periodSeconds: 10
+    startup:
+      path: /health
+      port: 4004
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      failureThreshold: 10
+
+# ── Frontend ─────────────────────────────────────────────────
+frontend:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "secretpower/kubekitchen-frontend"
+    tag: ""
+    pullPolicy: ""
+  service:
+    port: 8080
+    targetPort: 8080
+    type: ClusterIP
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "128Mi"
+      cpu: "200m"
+  probes:
+    liveness:
+      path: /health
+      port: 8080
+      initialDelaySeconds: 15
+      periodSeconds: 15
+    readiness:
+      path: /health
+      port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 10
+    startup:
+      path: /health
+      port: 8080
+      initialDelaySeconds: 3
+      periodSeconds: 5
+      failureThreshold: 10
+
+# ── MongoDB ──────────────────────────────────────────────────
+mongodb:
+  enabled: true
+  image:
+    repository: "mongo"
+    tag: "7"
+    pullPolicy: IfNotPresent
+  storage:
+    size: "5Gi"
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "300m"
+  securityContext:
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+  probes:
+    liveness:
+      initialDelaySeconds: 40
+      periodSeconds: 20
+      timeoutSeconds: 10
+    readiness:
+      initialDelaySeconds: 20
+      periodSeconds: 10
+      timeoutSeconds: 5
+
+# ── Seeder Job ───────────────────────────────────────────────
+seeder:
+  enabled: true
+  image:
+    repository: "secretpower/kubekitchen-seeder"
+    tag: ""
+    pullPolicy: ""
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 3
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"

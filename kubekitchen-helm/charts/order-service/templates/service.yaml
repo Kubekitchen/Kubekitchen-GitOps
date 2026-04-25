@@ -1,0 +1,61 @@
+{{- if .Values.global.blueGreen }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service-active
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "order-service.labels" . | nindent 4 }}
+    tier: backend
+    role: active
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "order-service.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service-preview
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "order-service.labels" . | nindent 4 }}
+    tier: backend
+    role: preview
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "order-service.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+{{- else }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "order-service.labels" . | nindent 4 }}
+    tier: backend
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "order-service.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+{{- end }}

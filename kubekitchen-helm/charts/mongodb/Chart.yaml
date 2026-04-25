@@ -1,0 +1,6 @@
+apiVersion: v2
+name: mongodb
+description: KubeKitchen MongoDB StatefulSets (one per service)
+type: application
+version: 1.0.0
+appVersion: "7.0"

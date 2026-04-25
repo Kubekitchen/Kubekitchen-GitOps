@@ -1,0 +1,7 @@
+﻿{{ include "mongodb.headlessService" (dict "name" "auth" "Values" .Values "Release" .Release "Chart" .Chart) }}
+---
+{{ include "mongodb.headlessService" (dict "name" "restaurant" "Values" .Values "Release" .Release "Chart" .Chart) }}
+---
+{{ include "mongodb.headlessService" (dict "name" "menu" "Values" .Values "Release" .Release "Chart" .Chart) }}
+---
+{{ include "mongodb.headlessService" (dict "name" "order" "Values" .Values "Release" .Release "Chart" .Chart) }}

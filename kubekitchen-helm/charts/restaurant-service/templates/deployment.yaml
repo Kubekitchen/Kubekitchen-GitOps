@@ -42,6 +42,10 @@ spec:
         checksum/secret: {{ include "restaurant-service.secretChecksum" . }}
     spec:
       serviceAccountName: {{ .Values.global.serviceAccountName }}
+      {{- if .Values.global.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.global.nodeSelector | nindent 8 }}
+      {{- end }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 1001

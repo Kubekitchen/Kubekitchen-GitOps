@@ -19,6 +19,11 @@ global:
   environment: dev
   namespace: kubekitchen-dev
 
+  # Pin ALL pods to Worker1 (where ingress-nginx also runs)
+  # This prevents scheduling issues across nodes
+  nodeSelector:
+    kubernetes.io/hostname: ip-172-31-66-23
+
   # Project labels
   project: kubekitchen
 

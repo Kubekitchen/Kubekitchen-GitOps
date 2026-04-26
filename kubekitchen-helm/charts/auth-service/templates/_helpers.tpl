@@ -32,8 +32,6 @@ Selector labels
 */}}
 {{- define "auth-service.selectorLabels" -}}
 app: auth-service
-app.kubernetes.io/name: auth-service
-app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*

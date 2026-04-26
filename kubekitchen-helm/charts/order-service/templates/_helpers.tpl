@@ -32,8 +32,6 @@ Selector labels
 */}}
 {{- define "order-service.selectorLabels" -}}
 app: order-service
-app.kubernetes.io/name: order-service
-app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*

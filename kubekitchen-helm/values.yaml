@@ -10,53 +10,43 @@ global:
   imageOwner: "secretpower"
   imageTag: "dev-latest"
   imagePullPolicy: Always
-
   # Blue-Green deployment strategy (requires Argo Rollouts)
   # false = regular Deployment (dev) | true = Argo Rollout blue-green (prod)
   blueGreen: false
-
   # Environment
   environment: dev
   namespace: kubekitchen-dev
-
   # Project labels
   project: kubekitchen
-
   # JWT Secret (override per environment — use Sealed Secrets / ESO in prod)
   jwtSecret: "dev-jwt-secret-change-this-256bit-key"
   jwtExpiresIn: "7d"
-
   # Node environment
   nodeEnv: "development"
-
   # Storage class (must exist in your cluster — matches your NFS provisioner)
   storageClass: "kubekitchen-nfs"
-
   # Service account (created once in umbrella templates/)
   serviceAccountName: "kubekitchen-sa"
-
   # MongoDB connection URIs (consumed by services via Secret)
   mongoUris:
     auth: "mongodb://mongodb-auth-0.mongodb-auth-headless:27017/authdb"
     restaurant: "mongodb://mongodb-restaurant-0.mongodb-restaurant-headless:27017/restaurantdb"
     menu: "mongodb://mongodb-menu-0.mongodb-menu-headless:27017/menudb"
     order: "mongodb://mongodb-order-0.mongodb-order-headless:27017/orderdb"
-
   # Internal ClusterIP service URLs (injected as env vars into containers)
   serviceUrls:
     auth: "http://auth-service:4001"
     restaurant: "http://restaurant-service:4002"
     menu: "http://menu-service:4003"
     order: "http://order-service:4004"
-
 # ── Auth Service ─────────────────────────────────────────────
 auth-service:
   enabled: true
   replicaCount: 1
   image:
     repository: "secretpower/kubekitchen-auth-service"
-    tag: ""           # Empty = falls back to global.imageTag
-    pullPolicy: ""    # Empty = falls back to global.imagePullPolicy
+    tag: "" # Empty = falls back to global.imageTag
+    pullPolicy: "" # Empty = falls back to global.imagePullPolicy
   service:
     port: 4001
     targetPort: 4001
@@ -85,14 +75,13 @@ auth-service:
       initialDelaySeconds: 5
       periodSeconds: 5
       failureThreshold: 10
-
 # ── Restaurant Service ───────────────────────────────────────
 restaurant-service:
   enabled: true
   replicaCount: 1
   image:
     repository: "secretpower/kubekitchen-restaurant-service"
-    tag: ""
+    tag: "v1.0.9"
     pullPolicy: ""
   service:
     port: 4002
@@ -122,7 +111,6 @@ restaurant-service:
       initialDelaySeconds: 5
       periodSeconds: 5
       failureThreshold: 10
-
 # ── Menu Service ─────────────────────────────────────────────
 menu-service:
   enabled: true
@@ -159,7 +147,6 @@ menu-service:
       initialDelaySeconds: 5
       periodSeconds: 5
       failureThreshold: 10
-
 # ── Order Service ────────────────────────────────────────────
 order-service:
   enabled: true
@@ -196,7 +183,6 @@ order-service:
       initialDelaySeconds: 5
       periodSeconds: 5
       failureThreshold: 10
-
 # ── Frontend ─────────────────────────────────────────────────
 frontend:
   enabled: true
@@ -233,7 +219,6 @@ frontend:
       initialDelaySeconds: 3
       periodSeconds: 5
       failureThreshold: 10
-
 # ── MongoDB ──────────────────────────────────────────────────
 mongodb:
   enabled: true
@@ -263,7 +248,6 @@ mongodb:
       initialDelaySeconds: 20
       periodSeconds: 10
       timeoutSeconds: 5
-
 # ── Seeder Job ───────────────────────────────────────────────
 seeder:
   enabled: true

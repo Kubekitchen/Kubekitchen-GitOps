@@ -32,8 +32,6 @@ Selector labels
 */}}
 {{- define "menu-service.selectorLabels" -}}
 app: menu-service
-app.kubernetes.io/name: menu-service
-app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*

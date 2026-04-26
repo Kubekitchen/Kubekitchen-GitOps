@@ -32,8 +32,6 @@ Selector labels
 */}}
 {{- define "frontend.selectorLabels" -}}
 app: frontend
-app.kubernetes.io/name: frontend
-app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*

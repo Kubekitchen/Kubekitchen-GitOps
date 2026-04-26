@@ -3,7 +3,7 @@
 global:
   environment: prod
   namespace: kubekitchen-prod
-  imageTag: "prod-latest"
+  imageTag: "dev-latest"  # Will be updated by CI when first prod image is built
   nodeEnv: "production"
   blueGreen: true   # ← Enables Argo Rollouts blue-green in prod
   # ⚠️  Replace with a real 256-bit secret — use Sealed Secrets or ESO in prod!

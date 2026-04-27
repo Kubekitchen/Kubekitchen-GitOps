@@ -81,7 +81,7 @@ restaurant-service:
   replicaCount: 1
   image:
     repository: "secretpower/kubekitchen-restaurant-service"
-    tag: "v1.0.9"
+    tag: "v1.0.10"
     pullPolicy: ""
   service:
     port: 4002

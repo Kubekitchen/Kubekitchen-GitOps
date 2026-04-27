@@ -117,7 +117,7 @@ menu-service:
   replicaCount: 1
   image:
     repository: "secretpower/kubekitchen-menu-service"
-    tag: "v1.0.7"
+    tag: "v1.0.8"
     pullPolicy: ""
   service:
     port: 4003

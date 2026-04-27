@@ -13,6 +13,9 @@ metadata:
     tier: backend
   annotations:
     argocd.argoproj.io/sync-wave: "2"
+    {{- if .Values.global.blueGreen }}
+    argocd.argoproj.io/sync-options: Replace=true
+    {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:

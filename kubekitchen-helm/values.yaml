@@ -45,7 +45,7 @@ auth-service:
   replicaCount: 1
   image:
     repository: "secretpower/kubekitchen-auth-service"
-    tag: "v1.0.8" # Empty = falls back to global.imageTag
+    tag: "v1.0.9" # Empty = falls back to global.imageTag
     pullPolicy: "" # Empty = falls back to global.imagePullPolicy
   service:
     port: 4001
